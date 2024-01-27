@@ -2,6 +2,10 @@ import { experimental_extendTheme as extendTheme } from '@mui/material/styles'
 import { teal, deepOrange, cyan, orange } from '@mui/material/colors'
 import { colors } from '@mui/material'
 
+const APP_BAR_HEIGHT = '58px'
+const BOARD_BAR_HEIGHT = '60px'
+const BOARD_CONTENT_HEIGHT = '58px'
+
 // Create a theme instance.
 const theme = extendTheme({
   trello:{
