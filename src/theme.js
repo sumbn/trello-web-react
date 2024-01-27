@@ -9,18 +9,18 @@ const theme = extendTheme({
     boardBarHeight: '60px'
   },
   colorSchemes: {
-    light: {
-      palette: {
-        primary: teal,
-        secondary: deepOrange
-      }
-    },
-    dark: {
-      palette: {
-        primary: cyan,
-        secondary: orange
-      }
-    }
+    // light: {
+    //   palette: {
+    //     primary: teal,
+    //     secondary: deepOrange
+    //   }
+    // },
+    // dark: {
+    //   palette: {
+    //     primary: cyan,
+    //     secondary: orange
+    //   }
+    // }
   },
   components: {
     MuiCssBaseline: {
@@ -35,8 +35,7 @@ const theme = extendTheme({
             borderRadius: '8px'
           },
           '*::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: '#2ecc71',
-            borderRadius: '8px'
+            backgroundColor: 'white'
           }
         }
       }
@@ -44,37 +43,46 @@ const theme = extendTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'none'
+          textTransform: 'none',
+          borderWidth: '0.5px',
+          '&:hover': { borderWidth: '0.5px' }
         }
       }
     },
     MuiInputLabel: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          color: theme.palette.primary.main,
-          fontSize: '0.875rem'
-        })
+        // root: ({ theme }) => ({
+        //   // color: theme.palette.primary.main,
+        //   fontSize: '0.875rem'
+        // })
+        root: { fontSize: '0.875rem' }
       }
     },
 
     MuiOutlinedInput: {
       styleOverrides: {
-        root: ({ theme }) => (
-          { color: theme.palette.primary.main,
-            fontSize: '0.875rem',
-            '.MuiOutlinedInput-notchedOutline': {
-              borderColor: theme.palette.primary.light
-            },
-            '&:hover': {
-              '.MuiOutlinedInput-notchedOutline': {
-                borderColor: theme.palette.primary.main
-              }
-            },
-            '& fieldSet': {
-              borderWidth:'1px !important'
-            }
-          }
-        )
+        // root: ({ theme }) => ({
+        //   // color: theme.palette.primary.main,
+        //   fontSize: '0.875rem',
+        //   // '.MuiOutlinedInput-notchedOutline': {
+        //   //   borderColor: theme.palette.primary.light
+        //   // },
+        //   // '&:hover': {
+        //   //   '.MuiOutlinedInput-notchedOutline': {
+        //   //     borderColor: theme.palette.primary.main
+        //   //   }
+        //   // },
+        //   '& fieldSet': { borderWidth:'0.5px !important' },
+        //   '&:hover fieldSet': { borderWidth:'1px !important' },
+        //   '&.Mui-focused fieldSet': { borderWidth:'1px !important'}
+        // })
+
+        root: {
+          fontSize: '0.875rem',
+          '& fieldSet': { borderWidth:'0.5px !important' },
+          '&:hover fieldSet': { borderWidth:'1px !important' },
+          '&.Mui-focused fieldSet': { borderWidth:'1px !important' }
+        }
       }
     }
   }
