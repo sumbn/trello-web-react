@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import ListColumns from './ListColumns/ListColumns'
 import { mapOrder } from '~/utils/sorts'
-import { DndContext, PointerSensor, useSensor, useSensors, MouseSensor, TouchSensor, DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core'
+import { DndContext, PointerSensor, useSensor, useSensors, MouseSensor, TouchSensor, DragOverlay, defaultDropAnimationSideEffects, closestCorners } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 import Column from './ListColumns/Column/Column'
 import Card from './ListColumns/Column/ListCards/Card/Card'
+import { cloneDeep } from 'lodash'
 
 const ACTIVE_DRAG_ITEM_TYPE = {
   COMLUMN:'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
@@ -30,17 +31,65 @@ function BoardContent({ board }) {
     setOrderedColumn(mapOrder(board?.columns, board?.columnOrderIds, '_id'))
   }, [board])
 
+  const findColumnByCardId = (cardId) => {
+    return orderedColumn.find(c => c.cards.map(j => j._id)?.includes(cardId))
+  }
+
   const handleDragStart = (event) => {
-    console.log('handleDragStart', event)
+    // console.log('handleDragStart', event)
     setActiveDragItemId(event?.active?.id)
     setActiveDragItemType(event?.active?.data?.current.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COMLUMN)
     setActiveDragItemData(event?.active?.data?.current)
   }
 
-  const handleDragEnd = (event) => {
-    // console.log('handle', event)
+  const handleDragOver = (event) => {
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COMLUMN) return
+    // console.log('handleDragOver', event)
     const { active, over } = event
-    if (!over) return
+    if (!active || !over) return
+    const { id: activeDraggingCardId, data: { current: activeDraggingCardData } } = active
+    const { id: overCardID } = over
+    const activeColumn = findColumnByCardId(activeDraggingCardId)
+    const overColumn = findColumnByCardId(overCardID)
+
+    if (!activeColumn || !overColumn) return
+    if (activeColumn._id !== overColumn._id) {
+      setOrderedColumn(prevColumns => {
+        const overCardIndex = overColumn?.cards?.findIndex(c => c._id === overCardID)
+        let newCarđIndex
+        const isBelowOverItem = active.rect.current.translated && active.rect.current.translated.top > over.rect.top + over.rect.height
+
+        const modifier = isBelowOverItem ? 1 : 0
+
+        newCarđIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn?.cards.length + 1
+
+        const nextColumns = cloneDeep(prevColumns)
+        const nextActiveColumn = nextColumns.find(column => column._id === activeColumn._id)
+        const nextOverColumn = nextColumns.find(column => column._id === overColumn._id)
+
+        if (nextActiveColumn) {
+          nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
+          nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(card => card._id)
+        }
+
+        if (nextOverColumn) {
+          nextOverColumn.cards = nextOverColumn.cards.filter(card => card._id !== activeDraggingCardId)
+          nextOverColumn.cards = nextOverColumn.cards.toSpliced(newCarđIndex, 0, activeDraggingCardData)
+          nextOverColumn.cardOrderIds = nextOverColumn.cards.map(card => card._id)
+        }
+        return nextColumns
+      })
+    }
+  }
+
+  const handleDragEnd = (event) => {
+    // console.log('handle drag end', event)
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) {
+      // console.log('card')
+    }
+
+    const { active, over } = event
+    if (!active || !over) return
 
     if (active.id !== over.id) {
       const oldIndex = orderedColumn.findIndex(c => c._id === active.id)
@@ -60,7 +109,13 @@ function BoardContent({ board }) {
   }
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors}>
+    <DndContext
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      >
       <Box sx={{
         width: '100%',
         height: (theme) => theme.trello.boardContentHeight,
