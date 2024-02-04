@@ -41,13 +41,15 @@ function BoardBar({ board }) {
       // borderBottom: '1px solid white'
     }}>
       <Box sx={{ display:'flex', alignItems:'center', gap: 2 }} >
-        <Chip
-          sx={CHIP_STYLE}
-          icon={<DashboardIcon />}
-          label={board?.title}
-          clickable
+        <Tooltip title={board?.des}>
+          <Chip
+            sx={CHIP_STYLE}
+            icon={<DashboardIcon />}
+            label={board?.title}
+            clickable
           // onclick={() => {}}
-        />
+          />
+        </Tooltip>
 
         {/* { board?.type &&
         <Chip
